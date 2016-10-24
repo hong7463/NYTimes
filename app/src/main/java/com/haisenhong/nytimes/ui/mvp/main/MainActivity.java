@@ -130,10 +130,16 @@ public class MainActivity extends AppCompatActivity implements FilterDialog.OnFi
         presenter.fetchMoreBooks(0, query, beginDate, sortOrder, newsDesk);
     }
 
-    private void searchArticles(String query) {
+    private void searchArticles(final String query) {
         this.query = query;
         articles.clear();
         presenter.fetchMoreBooks(0, query, beginDate, sortOrder, newsDesk);
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener((StaggeredGridLayoutManager) recyclerView.getLayoutManager()) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                presenter.fetchMoreBooks(page, query, beginDate, sortOrder, newsDesk);
+            }
+        });
     }
 
     public void showResults(ArticleSearchResponse response) {
@@ -165,12 +171,18 @@ public class MainActivity extends AppCompatActivity implements FilterDialog.OnFi
     }
 
     @Override
-    public void onFilterClick(String beginDate, String sortOrder, String newsDesk) {
+    public void onFilterClick(final String beginDate, final String sortOrder, final String newsDesk) {
         this.beginDate = beginDate;
         this.sortOrder = sortOrder;
         this.newsDesk = newsDesk;
         articles.clear();
         presenter.fetchMoreBooks(0, this.query, beginDate, sortOrder, newsDesk);
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener((StaggeredGridLayoutManager) recyclerView.getLayoutManager()) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                presenter.fetchMoreBooks(page, query, beginDate, sortOrder, newsDesk);
+            }
+        });
     }
 
 }
