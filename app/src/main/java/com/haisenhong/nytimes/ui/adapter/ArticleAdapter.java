@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.haisenhong.nytimes.R;
 import com.haisenhong.nytimes.data.responses.Doc;
+import com.haisenhong.nytimes.data.responses.MultipleMedia;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -30,10 +31,12 @@ import butterknife.ButterKnife;
  * Created by hison7463 on 10/20/16.
  */
 
-public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleViewHolder> {
+public class ArticleAdapter extends RecyclerView.Adapter {
 
     private List<Doc> list;
     private Context context;
+    private final int NORMAL = 0;
+    private final int TEXTONLY = 1;
 
     public ArticleAdapter(List<Doc> list, Context context) {
         this.context = context;
@@ -41,33 +44,72 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
     }
 
     @Override
-    public ArticleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.article_item, parent, false);
-        ArticleViewHolder viewHolder = new ArticleViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        RecyclerView.ViewHolder viewHolder = null;
+        switch (viewType) {
+            case NORMAL: {
+                View view = inflater.inflate(R.layout.article_item, parent, false);
+                viewHolder = new ArticleViewHolder(view);
+                break;
+            }
+            case TEXTONLY: {
+                View view = inflater.inflate(R.layout.text_only_item, parent, false);
+                viewHolder = new TextOnlyViewHolder(view);
+                break;
+            }
+        }
+
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ArticleViewHolder holder, final int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
-        holder.title.setText(list.get(holder.getAdapterPosition()).getHeadline().getMain());
-        if(list.get(position).getMultipleMedia() != null && list.get(position).getMultipleMedia().length > 0) {
-            Glide.with(context).load(context.getString(R.string.nytimes_url) + list.get(position).getMultipleMedia()[0].getUrl()).centerCrop().into(holder.image);
-        }
-        else {
-            holder.image.setImageResource(R.drawable.new_york_times_logo);
-        }
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                PendingIntent pendingIntent = getPendingIntent(list.get(position).getWeb_url());
-                Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.menu_share);
-                builder.setActionButton(bitmap, "Share", pendingIntent);
-                CustomTabsIntent intent = builder.build();
-                intent.launchUrl((Activity) context, Uri.parse(list.get(position).getWeb_url()));
+        switch (holder.getItemViewType()) {
+            case NORMAL: {
+                ArticleViewHolder viewHolder = (ArticleViewHolder) holder;
+                viewHolder.title.setText(list.get(holder.getAdapterPosition()).getHeadline().getMain());
+                Glide.with(context).load(context.getString(R.string.nytimes_url) + list.get(position).getMultipleMedia()[0].getUrl()).centerCrop().into(viewHolder.image);
+                viewHolder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                        PendingIntent pendingIntent = getPendingIntent(list.get(position).getWeb_url());
+                        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.menu_share);
+                        builder.setActionButton(bitmap, "Share", pendingIntent);
+                        CustomTabsIntent intent = builder.build();
+                        intent.launchUrl((Activity) context, Uri.parse(list.get(position).getWeb_url()));
+                    }
+                });
+                break;
             }
-        });
+            case TEXTONLY: {
+                TextOnlyViewHolder viewHolder = (TextOnlyViewHolder) holder;
+                viewHolder.title.setText(list.get(holder.getAdapterPosition()).getSnippet());
+                viewHolder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                        PendingIntent pendingIntent = getPendingIntent(list.get(position).getWeb_url());
+                        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.menu_share);
+                        builder.setActionButton(bitmap, "Share", pendingIntent);
+                        CustomTabsIntent intent = builder.build();
+                        intent.launchUrl((Activity) context, Uri.parse(list.get(position).getWeb_url()));
+                    }
+                });
+                break;
+            }
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        MultipleMedia[] medias = list.get(position).getMultipleMedia();
+        if(medias == null || medias.length == 0) {
+            return TEXTONLY;
+        }
+        return NORMAL;
     }
 
     private PendingIntent getPendingIntent(String url) {
@@ -96,6 +138,19 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
             ButterKnife.bind(this, view);
         }
 
+    }
+
+    public class TextOnlyViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.item_title)
+        TextView title;
+        @BindView(R.id.item_view)
+        View view;
+
+        public TextOnlyViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
     }
 
 }

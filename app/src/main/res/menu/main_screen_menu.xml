@@ -2,15 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/main_filter"
-        android:title="@string/fitler"
-        app:showAsAction="ifRoom"
-        android:icon="@android:drawable/ic_menu_sort_by_size"/>
-    <item
         android:id="@+id/main_search"
         android:orderInCategory="5"
         android:title="@string/menu_search"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView"
         android:icon="@android:drawable/ic_menu_search" />
+    <item
+        android:id="@+id/main_filter"
+        android:title="@string/fitler"
+        app:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_sort_by_size"/>
 </menu>
