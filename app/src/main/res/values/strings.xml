@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">NYTimes</string>
+    <string name="menu_search">Search</string>
+    <string name="apikey">313d4b677a7b4d6a846c6fc4b8debac2</string>
+    <string name="sort_order">Sort By</string>
+    <string name="fitler">Filter</string>
+    <string name="arts">Arts</string>
+    <string name="fashion">Fashion &amp; Style</string>
+    <string name="sports">Sports</string>
+    <string name="apply">APPLY</string>
+    <string name="cancel">CANCEL</string>
+    <string name="share">Share</string>
+    <string name="begin_date">Begin Date:</string>
+
+    <string-array name="orders">
+        <item>newest</item>
+        <item>oldest</item>
+    </string-array>
+</resources>
